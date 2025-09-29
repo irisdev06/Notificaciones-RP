@@ -58,41 +58,35 @@ def exportar_con_estilo(df):
         col_idx = df.columns.get_loc("ALERTA DE VENCIMIENTO")
 
         # Formatos
-        formato_rojo = workbook.add_format({"bg_color": "#FF6961", "bold": True})     # rojo
-        formato_amarillo = workbook.add_format({"bg_color": "#FFD966", "bold": True}) # amarillo
-        formato_verde = workbook.add_format({"bg_color": "#77DD77", "bold": True})    # verde
-        formato_gris = workbook.add_format({"bg_color": "#D3D3D3", "italic": True})   # gris
+        formato_rojo = workbook.add_format({"bg_color": "#FF6961", "bold": True})      # rojo
+        formato_amarillo = workbook.add_format({"bg_color": "#FFD966", "bold": True})  # amarillo
+        formato_verde = workbook.add_format({"bg_color": "#77DD77", "bold": True})     # verde
+        formato_gris = workbook.add_format({"bg_color": "#D3D3D3", "italic": True})    # gris
+        formato_azul = workbook.add_format({"bg_color": "#9BC2E6"})                    # azul
 
         # Filas de datos (empezando en 1 porque la fila 0 es encabezado)
         start_row = 1
         end_row = start_row + len(df) - 1
 
-        # ALERTA ROJA
-        worksheet.conditional_format(
-            start_row, col_idx, end_row, col_idx,
-            {"type": "cell", "criteria": "==", "value": '"ALERTA ROJA"', "format": formato_rojo}
-        )
+        # Reglas condicionales exactas
+        reglas = [
+            ("ALERTA ROJA", formato_rojo),
+            ("ALERTA AMARILLA", formato_amarillo),
+            ("ALERTA VERDE", formato_verde),
+            ("SIN FECHA", formato_gris),
+            ("EN TÉRMINOS", formato_azul),
+        ]
 
-        # ALERTA AMARILLA
-        worksheet.conditional_format(
-            start_row, col_idx, end_row, col_idx,
-            {"type": "cell", "criteria": "==", "value": '"ALERTA AMARILLA"', "format": formato_amarillo}
-        )
-
-        # ALERTA VERDE
-        worksheet.conditional_format(
-            start_row, col_idx, end_row, col_idx,
-            {"type": "cell", "criteria": "==", "value": '"ALERTA VERDE"', "format": formato_verde}
-        )
-
-        # SIN FECHA
-        worksheet.conditional_format(
-            start_row, col_idx, end_row, col_idx,
-            {"type": "cell", "criteria": "==", "value": '"SIN FECHA"', "format": formato_gris}
-        )
+        for texto, formato in reglas:
+            worksheet.conditional_format(
+                start_row, col_idx, end_row, col_idx,
+                {"type": "cell", "criteria": "equal to", "value": f'"{texto}"', "format": formato}
+            )
 
         # Encabezado con color distintivo
-        formato_encabezado = workbook.add_format({"bg_color": "#5A6772", "bold": True, "font_color": "white"})
+        formato_encabezado = workbook.add_format(
+            {"bg_color": "#5A6772", "bold": True, "font_color": "white"}
+        )
         worksheet.write(0, col_idx, df.columns[col_idx], formato_encabezado)
 
     output.seek(0)
