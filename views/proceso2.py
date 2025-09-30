@@ -8,12 +8,12 @@ from io import BytesIO
 def columna_alertavencimiento(archivo):
     df = pd.read_excel(archivo, sheet_name="REVISION PENSION 2025")
 
-    if "FECHA DE RADICACION" not in df.columns:
-        st.error("⚠️ La columna 'FECHA DE RADICACION' no está en la hoja REVISION PENSION 2025.")
+    if "FECHA DE ULTIMA REVISION" not in df.columns:
+        st.error("⚠️ La columna 'FECHA DE ULTIMA REVISION' no está en la hoja REVISION PENSION 2025.")
         return None
 
     # Convertir a fechas
-    df["FECHA DE RADICACION"] = pd.to_datetime(df["FECHA DE RADICACION"], errors="coerce")
+    df["FECHA DE ULTIMA REVISION"] = pd.to_datetime(df["FECHA DE ULTIMA REVISION"], errors="coerce")
     hoy = pd.to_datetime(datetime.now().date())
 
     def evaluar_fecha(x):
@@ -31,9 +31,9 @@ def columna_alertavencimiento(archivo):
         else:
             return "EN TÉRMINOS"
 
-    df["FECHA VENCIMIENTO"] = df["FECHA DE RADICACION"] + pd.DateOffset(years=3)
+    df["FECHA VENCIMIENTO"] = df["FECHA DE ULTIMA REVISION"] + pd.DateOffset(years=3)
     df["DIAS_RESTANTES"] = (df["FECHA VENCIMIENTO"] - hoy).dt.days
-    df["ALERTA DE VENCIMIENTO"] = df["FECHA DE RADICACION"].apply(evaluar_fecha)
+    df["ALERTA DE VENCIMIENTO"] = df["FECHA DE ULTIMA REVISION"].apply(evaluar_fecha)
     return df
 
 
